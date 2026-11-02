@@ -21,16 +21,29 @@ contribution the manifest declares.
 
 ## What lives where
 
-| Here | Ponpoko's host |
+| Chat surface | Ponpoko Host |
 | --- | --- |
-| threads rail, transcript, composer, Markdown, PonpokoUI, search, export, shortcuts | providers, credentials, the model and tool loop |
-| presentation preferences (rail collapsed, chosen provider id, theme) | central transcript database and migrations |
-| the broker client in `src/bridge/` | the composed system prompt and checkpoints |
-| the icons and motion of the mascot | install, storage, probes and Git consent |
+| thread history, search, pins, settings and export in its own SQLite store | provider configuration and credentials |
+| conversation context, system prompt, turn orchestration and durable stream events | one shared AI/tool work runner, budgets, leases and checkpoints |
+| UI, Markdown, PonpokoUI, attachments and presentation preferences | generic OS dialogs, clipboard, palette, installation and work services |
 
-The page never imports `@tauri-apps`, never holds a key and never composes a system prompt. It
-asks the host for what it shows, over the versioned broker described in
-[`docs/host-protocol.md`](docs/host-protocol.md).
+`backend/` builds into `dist/bin/chat-backend`, a standalone executable with its JavaScript
+runtime included. End users do not need Bun installed to run this backend. Build dependencies
+are installed from this repository's lockfile. The bundled runtime makes this bundle about
+86 MiB on macOS; Host uses the same 128 MiB bundle limit for every surface.
+
+Host supplies `PONPOKO_SURFACE_DATA_DIR` and `PONPOKO_HOST_CONTROL` to every backend.
+Conversations live in `chat.sqlite3` inside that data directory, outside the installed bundle.
+On first launch only, `PONPOKO_HOST_DATABASE` supplies the legacy database for a read-only,
+transactional import. IDs, ordering, timestamps, custom instructions and tool metadata survive.
+The migration ledger prevents a deleted conversation from returning on reinstall. The original
+Host rows are retained for old CLI/work traces; new Chat messages are written only to Chat's store.
+
+The page never imports Tauri or holds a provider key. Conversation calls use normal
+`host.surface/backend.call`; OS services use `host.platform`. The backend owns its prompt and
+asks the generic authenticated Host runtime to execute budgeted work. It observes existing work
+after restart, and never automatically retries a mutation with an unknown outcome.
+See [`docs/host-protocol.md`](docs/host-protocol.md).
 
 ## Trust, honestly
 
@@ -42,7 +55,8 @@ not claim one.
 ## Layout
 
 ```text
-surface.json          the manifest the host parser reads
+surface.json          the manifest and backend methods the host parser reads
+backend/              durable history, migration, context and turn orchestration
 src/main.tsx          mount, boot, and the unhosted/mismatch screens
 src/app/              Chat shell, host API, boot
 src/bridge/           versioned broker client (channel, request, answer, events)

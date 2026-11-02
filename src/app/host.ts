@@ -1,5 +1,6 @@
+import { subscribeBackend, unsubscribeBackend } from "./streams";
 import type { Broker, HelloView } from "../bridge/broker";
-import { HOST_CONVERSATION, PROTOCOL_VERSION, type BrokerEvent } from "../contracts/protocol";
+import { HOST_PLATFORM, HOST_SURFACE, PROTOCOL_VERSION, type BrokerEvent } from "../contracts/protocol";
 import {
   readContextFile,
   readMessages,
@@ -27,7 +28,9 @@ export interface Host {
 }
 
 export function hostChat<T>(host: Host, operation: string, payload?: unknown): Promise<T> {
-  return host.broker.call<T>(HOST_CONVERSATION, operation, payload);
+  if (["attachments.pick", "attachments.read", "attachments.paste-image", "settings.open", "link.open", "preferences.list"].includes(operation))
+    return host.broker.call<T>(HOST_PLATFORM, operation, payload);
+  return host.broker.call<T>(HOST_SURFACE, "backend.call", { method: operation === "protocol.info" ? "app.info" : operation, params: payload ?? {} });
 }
 
 export async function readProtocol(host: Host): Promise<ProtocolInfoView> {
@@ -96,10 +99,10 @@ export async function updateThread(
 }
 
 export async function exportThread(host: Host, threadId: string): Promise<string | null> {
-  const answered = await hostChat<unknown>(host, "threads.export", { thread_id: threadId });
-  const row = typeof answered === "object" && answered !== null ? (answered as Record<string, unknown>) : {};
-  if (row.cancelled === true) return null;
-  return typeof row.path === "string" ? row.path : null;
+  const path = await host.broker.call<string | null>(HOST_PLATFORM, "files.save", { name: "conversation.md" });
+  if (!path) return null;
+  const result = await hostChat<{ path: string }>(host, "threads.export", { thread_id: threadId, path });
+  return result.path;
 }
 
 export async function listMessages(host: Host, threadId: string): Promise<ChatMessageView[]> {
@@ -154,16 +157,11 @@ export async function subscribeStream(
   threadId: string,
   after = 0,
 ): Promise<StreamSubscription> {
-  const answered = await hostChat<unknown>(host, "stream.subscribe", { thread_id: threadId, after });
-  const row = typeof answered === "object" && answered !== null ? (answered as Record<string, unknown>) : {};
-  return {
-    cursor: typeof row.cursor === "number" ? row.cursor : after,
-    subscription_id: typeof row.subscription_id === "string" ? row.subscription_id : "",
-  };
+  return subscribeBackend(host, threadId, after);
 }
 
 export async function unsubscribeStream(host: Host, threadId: string): Promise<void> {
-  await hostChat(host, "stream.unsubscribe", { thread_id: threadId });
+  unsubscribeBackend(host, threadId);
 }
 
 export async function listProviders(host: Host): Promise<ChatProviderView[]> {

@@ -58,6 +58,8 @@ export class Broker {
 
   private readonly pending = new Map<string, Pending>();
 
+  private readonly stopHandlers = new Set<() => void>();
+
   private readonly eventHandlers = new Set<EventHandler>();
 
   private palette: Record<string, string> | null = null;
@@ -89,6 +91,8 @@ export class Broker {
   }
 
   stop(): void {
+    for (const handler of this.stopHandlers) handler();
+    this.stopHandlers.clear();
     this.unsubscribe?.();
     this.unsubscribe = null;
     for (const [id, pending] of this.pending) {
@@ -118,6 +122,15 @@ export class Broker {
       }, this.helloTimeoutMs);
       this.helloWaiters.push({ resolve, reject, timer });
     });
+  }
+
+  onStop(handler: () => void): () => void {
+    this.stopHandlers.add(handler);
+    return () => this.stopHandlers.delete(handler);
+  }
+
+  emitBackendEvent(event: BrokerEvent): void {
+    for (const handler of this.eventHandlers) handler(event);
   }
 
   onEvent(handler: EventHandler): () => void {

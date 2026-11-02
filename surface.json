@@ -3,12 +3,36 @@
   "name": "Chat",
   "version": "0.1.0",
   "entry": "index.html",
-  "description": "Chat with Poko using the Ponpoko host runtime.",
+  "description": "Conversations with their own durable history and backend, using the shared Ponpoko AI runtime.",
   "contributes": [
     {
       "slot": "nav",
       "title": "Chat",
       "icon": "generic"
     }
+  ],
+  "backend": {
+    "command": "bin/chat-backend"
+  },
+  "methods": [
+    "app.info",
+    "threads.list",
+    "threads.create",
+    "threads.update",
+    "threads.rename",
+    "threads.pin",
+    "threads.delete",
+    "threads.search",
+    "threads.export",
+    "messages.list",
+    "messages.append",
+    "messages.truncate",
+    "message.send",
+    "turn.cancel",
+    "stream.events",
+    "providers.list",
+    "preferences.list",
+    "preferences.set",
+    "stream.snapshot"
   ]
 }

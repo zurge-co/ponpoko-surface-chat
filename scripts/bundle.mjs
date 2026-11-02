@@ -7,7 +7,7 @@ const DIST = join(PROJECT, "dist");
 const MANIFEST = join(PROJECT, "surface.json");
 
 const MAX_FILES = 4096;
-const MAX_BYTES = 64 * 1024 * 1024;
+const MAX_BYTES = 128 * 1024 * 1024;
 
 function fail(message) {
   console.error(`bundle: ${message}`);
@@ -39,6 +39,9 @@ async function main() {
     fail(`the build produced no ${entry} — vite did not finish, so there is nothing to install`);
   }
 
+  await mkdir(join(DIST, "bin"), { recursive: true });
+  const compiled = Bun.spawnSync(["bun", "build", "backend/main.ts", "--compile", "--minify", "--outfile", "dist/bin/chat-backend"], { cwd: PROJECT, stdout: "inherit", stderr: "inherit" });
+  if (compiled.exitCode !== 0) fail("Chat backend did not compile");
   const files = await walk(DIST);
   const total = files.reduce((sum, file) => sum + file.bytes, 0);
   if (files.length > MAX_FILES) fail(`${files.length} files is more than the host's ${MAX_FILES}`);

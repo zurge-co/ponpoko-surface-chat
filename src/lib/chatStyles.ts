@@ -46,7 +46,7 @@ export const CHAT_STYLES: readonly ChatStyle[] = [
 ];
 
 export const CUSTOM_INSTRUCTIONS_NOTE =
-  "This text shapes how Poko talks in this thread. Ponpoko composes its own identity and the PonpokoUI contract around it on the host, so the model still knows when a message is a conversation and when it is a commission.";
+  "This text shapes how Poko talks in this thread. Chat composes its identity and the PonpokoUI contract around it in its backend, so the model still knows when a message is a conversation and when it is a commission.";
 
 export function resolveChatStyle(id: string | null | undefined): ChatStyle {
   return CHAT_STYLES.find((style) => style.id === id) ?? CHAT_STYLES[0]!;

@@ -34,8 +34,8 @@ const ROWS: ParityRow[] = [
   { capability: "truncate messages", hostCall: "messages.truncate", where: "src/app/host.ts" },
   { capability: "stream a turn", hostCall: "message.send", where: "src/app/host.ts" },
   { capability: "cancel a turn", hostCall: "turn.cancel", where: "src/app/host.ts" },
-  { capability: "subscribe stream", hostCall: "stream.subscribe", where: "src/app/host.ts" },
-  { capability: "unsubscribe stream", hostCall: "stream.unsubscribe", where: "src/app/host.ts" },
+  { capability: "subscribe stream", hostCall: "stream.events", where: "src/app/streams.ts" },
+
   { capability: "provider display metadata", hostCall: "providers.list", where: "src/app/host.ts" },
   { capability: "pick attachments", hostCall: "attachments.pick", where: "src/app/host.ts" },
   { capability: "read attachments", hostCall: "attachments.read", where: "src/app/host.ts" },
@@ -68,11 +68,13 @@ async function walk(dir: string, out: string[] = []): Promise<string[]> {
   return out;
 }
 
+const manifest = await Bun.file(join(ROOT, "surface.json")).json();
+
 describe("harness parity inventory", () => {
   test("every host-backed capability names a real operation of the closed union", () => {
     for (const row of ROWS) {
       if (row.hostCall === null) continue;
-      expect(protocol.isOperation("host.conversation", row.hostCall)).toBe(true);
+      expect(protocol.isOperation("host.platform", row.hostCall) || manifest.methods.includes(row.hostCall)).toBe(true);
     }
   });
 
@@ -138,7 +140,7 @@ describe("standalone checkout", () => {
     expect((await stat(join(dist, "surface.json"))).isFile()).toBe(true);
     expect((await stat(join(dist, "index.html"))).isFile()).toBe(true);
     const summary = JSON.parse(await readFile(join(dist, "bundle.json"), "utf8"));
-    expect(summary.bytes).toBeLessThan(64 * 1024 * 1024);
+    expect(summary.bytes).toBeLessThan(128 * 1024 * 1024);
     expect(summary.files).toBeLessThanOrEqual(4096);
   });
 });

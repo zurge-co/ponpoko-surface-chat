@@ -5,7 +5,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PROJECT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const SKIP = new Set(["node_modules", "dist", ".git", "bun.lock"]);
+const SKIP = new Set(["node_modules", "dist", ".git"]);
 
 function run(command, args, cwd) {
   return new Promise((done, fail) => {
@@ -71,10 +71,10 @@ async function main() {
   }
 
   console.log(`standalone: ${files.length} files copied to ${copy} with no node_modules and no dist`);
-  await run("bun", ["install", "--ignore-scripts"], copy);
+  await run("bun", ["install", "--ignore-scripts", "--frozen-lockfile"], copy);
   await run("bun", ["run", "typecheck"], copy);
-  await run("bun", ["test"], copy);
   await run("bun", ["run", "build"], copy);
+  await run("bun", ["test"], copy);
   await run("bun", ["run", "lint"], copy);
 
   const summary = JSON.parse(await readFile(join(copy, "dist", "bundle.json"), "utf8"));

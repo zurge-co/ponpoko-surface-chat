@@ -10,7 +10,7 @@ export const DROP_CONTROL = "ponpoko.host.drop";
 
 export const PROTOCOL_VERSION = 1;
 
-export const HOST_CONVERSATION = "host.conversation";
+export const HOST_PLATFORM = "host.platform";
 
 export const HOST_WORK = "host.work";
 
@@ -18,38 +18,16 @@ export const HOST_SURFACE = "host.surface";
 
 export const SURFACE_OPERATIONS = ["tool.file", "tool.paste", "backend.call"] as const;
 
-export const NAMESPACES = [HOST_CONVERSATION, HOST_WORK, HOST_SURFACE] as const;
+export const NAMESPACES = [HOST_PLATFORM, HOST_WORK, HOST_SURFACE] as const;
 
 export type Namespace = (typeof NAMESPACES)[number];
 
-export const CHAT_OPERATIONS = [
-  "protocol.info",
-  "threads.list",
-  "threads.create",
-  "threads.update",
-  "threads.rename",
-  "threads.pin",
-  "threads.delete",
-  "threads.search",
-  "threads.export",
-  "messages.list",
-  "messages.append",
-  "messages.truncate",
-  "message.send",
-  "stream.subscribe",
-  "stream.unsubscribe",
-  "turn.cancel",
-  "providers.list",
-  "attachments.pick",
-  "attachments.read",
-  "attachments.paste-image",
-  "preferences.list",
-  "preferences.set",
-  "settings.open",
-  "link.open",
+export const PLATFORM_OPERATIONS = [
+  "protocol.info", "providers.list", "attachments.pick", "attachments.read", "attachments.paste-image",
+  "files.save", "preferences.list", "settings.open", "link.open",
 ] as const;
 
-export type ChatOperation = (typeof CHAT_OPERATIONS)[number];
+export type PlatformOperation = (typeof PLATFORM_OPERATIONS)[number];
 
 export const WORK_OPERATIONS = [
   "list",
@@ -65,7 +43,7 @@ export const WORK_OPERATIONS = [
 export type WorkOperation = (typeof WORK_OPERATIONS)[number];
 
 export const OPERATIONS: Record<Namespace, readonly string[]> = {
-  [HOST_CONVERSATION]: CHAT_OPERATIONS,
+  [HOST_PLATFORM]: PLATFORM_OPERATIONS,
   [HOST_WORK]: WORK_OPERATIONS,
   [HOST_SURFACE]: SURFACE_OPERATIONS,
 };

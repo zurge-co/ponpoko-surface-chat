@@ -13,12 +13,12 @@ describe("closed operation unions", () => {
   });
 
   test("no operation may be smuggled into another namespace", () => {
-    const chatOnly = protocol.CHAT_OPERATIONS.filter(
+    const chatOnly = protocol.PLATFORM_OPERATIONS.filter(
       (name) => !(protocol.WORK_OPERATIONS as readonly string[]).includes(name),
     );
-    expect(chatOnly.length).toBe(protocol.CHAT_OPERATIONS.length);
+    expect(chatOnly.length).toBe(protocol.PLATFORM_OPERATIONS.length);
     for (const operation of protocol.WORK_OPERATIONS) {
-      expect(protocol.isOperation("host.conversation", operation)).toBe(false);
+      expect(protocol.isOperation("host.platform", operation)).toBe(false);
     }
   });
 
@@ -32,10 +32,10 @@ describe("closed operation unions", () => {
   });
 
   test("a namespace and its operation are both required to name a call", () => {
-    expect(protocol.isNamespace("host.conversation")).toBe(true);
+    expect(protocol.isNamespace("host.platform")).toBe(true);
     expect(protocol.isNamespace("host.everything")).toBe(false);
-    expect(protocol.isOperation("host.conversation", "threads.list")).toBe(true);
-    expect(protocol.isOperation("host.conversation", "threads.nuke")).toBe(false);
+    expect(protocol.isOperation("host.platform", "providers.list")).toBe(true);
+    expect(protocol.isOperation("host.platform", "threads.nuke")).toBe(false);
   });
 
   test("one channel and protocol serve every surface", () => {
@@ -46,13 +46,13 @@ describe("closed operation unions", () => {
   });
 
   test("a request carries the view, a request id and no free-form verb", () => {
-    const request = protocol.requestFor("view-a", "r1", "host.conversation", "threads.list", { a: 1 });
+    const request = protocol.requestFor("view-a", "r1", "host.platform", "providers.list", { a: 1 });
     expect(request).toEqual({
       channel: protocol.BROKER_CHANNEL,
       view: "view-a",
       request_id: "r1",
-      namespace: "host.conversation",
-      operation: "threads.list",
+      namespace: "host.platform",
+      operation: "providers.list",
       payload: { a: 1 },
     });
     expect("verb" in request).toBe(false);

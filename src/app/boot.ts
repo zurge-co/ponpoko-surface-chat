@@ -24,7 +24,7 @@ export function unhostedFailure(): BootFailure {
     detail:
       "Ponpoko loads this page inside its own window and hands it a narrow bridge. Opened on its own there is no host to ask, so there would be no threads to read and no model to reach.",
     recovery:
-      "Open Ponpoko and choose Chat from the tab bar. This bundle is installed from its own repository; it holds no database, no key and no Tauri IPC.",
+      "Open Ponpoko and choose Chat from the tab bar. This bundle is installed from its own repository; its backend keeps your conversations, and the shared Host runtime keeps model credentials.",
   };
 }
 

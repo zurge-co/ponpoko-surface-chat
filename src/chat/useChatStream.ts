@@ -138,6 +138,15 @@ export function useChatStream(input: ChatStreamInput) {
       const requestId = typeof payload.request_id === "string" ? payload.request_id : "";
       const threadId =
         typeof payload.thread_id === "string" ? payload.thread_id : (event.thread_id ?? "");
+      if (event.type === "restored") {
+        setInFlight(prev => ({ ...prev, [requestId]: { threadId, text: typeof payload.text === "string" ? payload.text : "", error: null, activities: [] } }));
+        if (typeof payload.error === "string" && payload.error) setError(payload.error);
+        return;
+      }
+      if (event.type === "backend-unavailable") {
+        setError(typeof payload.message === "string" ? payload.message : "Chat backend unavailable. Reload to reconnect.");
+        return;
+      }
       if (threadId.length > 0) {
         const decision = accept(cursorFor(threadId), event);
         if (decision.accept.length === 0) return;
@@ -220,12 +229,17 @@ export function useChatStream(input: ChatStreamInput) {
       ...prev,
       [requestId]: { threadId, text: "", error: null, activities: [] },
     }));
-    await sendTurn(host, {
+    try {
+      await sendTurn(host, {
       requestId,
       threadId,
       providerId: thread?.provider_id ?? providerId,
       messages: history,
-    });
+      });
+    } catch (error) {
+      setInFlight(prev => ({ ...prev, [requestId]: { threadId, text: "", error: String(error), activities: [] } }));
+      throw error;
+    }
   };
 
   const restream = async (plan: RestreamPlan, threadId: string) => {

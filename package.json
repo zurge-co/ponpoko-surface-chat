@@ -6,7 +6,7 @@
   "description": "The Chat surface: threads, Markdown and PonpokoUI over the narrow host broker of a Ponpoko surface workspace.",
   "scripts": {
     "dev": "vite",
-    "typecheck": "bunx tsc -p tsconfig.json --noEmit",
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit && bunx tsc -p tsconfig.backend.json --noEmit",
     "build": "bun run typecheck && bunx vite build && bun scripts/bundle.mjs",
     "test": "bun test test",
     "lint": "bunx oxlint --config oxlint.json"
@@ -19,9 +19,10 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
-    "@vitejs/plugin-react": "^6.1.2",
+    "@types/bun": "^1.4.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
     "oxlint": "1.90.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~7.0.2",

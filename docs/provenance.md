@@ -27,21 +27,23 @@ laws are proven on this side of the move.
 
 | Here | Host origin | Why it is not a copy |
 | --- | --- | --- |
-| `src/app/host.ts` | `app/src/lib/shellCore/chat_api.ts`, `stream_api.ts`, `llm_api.ts` | every `invoke()` became a `host.conversation` operation; there is no Tauri IPC in a surface |
+| `src/app/host.ts` | `app/src/lib/shellCore/chat_api.ts`, `stream_api.ts`, `llm_api.ts` | conversation calls now use the bundle backend; OS services use `host.platform`; there is no Tauri IPC in the surface |
 | `src/bridge/**` | `app/src/lib/surfaceBridge.ts` (host side of the old door) | the door verbs are replaced by the two namespaces of `docs/host-protocol.md` |
 | `src/chat/useChatThreads.ts` | same name | `listen("chat://…")` became `broker.onEvent`; storage preferences moved to `src/lib/prefs.ts` |
 | `src/chat/useChatStream.ts` | same name | the stream now arrives as broker events; the system prompt is composed by the host, not here |
 | `src/chat/useChatContext.ts` | same name | file dialogs, drag-and-drop and image paste became `attachments.*` operations and the host's drop control |
 | `src/chat/{Welcome,PokoSetup}.tsx` | same names | provider/key setup stays in the host: these only open the host settings window |
-| `src/chat/usePonpokoActions.ts` | same name | `open_external_url` became `host.conversation.link.open` |
-| `src/lib/chatStyles.ts` | `app/src/lib/prompts/styles.ts` | the style list and preambles the UI shows; the host composes the actual system prompt |
+| `src/chat/usePonpokoActions.ts` | same name | `open_external_url` became `host.platform.link.open` |
+| `src/lib/chatStyles.ts` | `app/src/lib/prompts/styles.ts` | the style list and preambles the UI shows; the backend composes the actual system prompt |
 | `src/lib/modelLabel.ts` | `app/src/lib/modelSetup.ts` | provider display metadata only — never a credential |
 | `src/lib/{poko,time,theme,mediaQuery,clipboard,prefs}.ts` | same names under `app/src/lib/` | unchanged or trimmed to what a surface needs |
 
 ## Deliberately left in the host
 
-Provider credentials and OAuth, the model and tool loop, checkpoints, the composed system
-prompt, the central transcript database, install/storage/Git, and every `@tauri-apps` import.
+Provider credentials and OAuth, the shared model/tool runtime, work checkpoints, legacy work
+traces, install/storage/Git, and every `@tauri-apps` import.
+Chat now owns conversation storage, prompts and turn orchestration in `backend/`, and uses the
+generic Host work runtime for inference and tools.
 Chat opens the host's settings window for providers and shows provider *display* metadata; it
 never sees a key.
 
