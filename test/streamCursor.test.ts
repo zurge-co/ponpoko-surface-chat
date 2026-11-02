@@ -88,14 +88,14 @@ describe("a reconnect through the real broker loses nothing and repeats nothing"
     });
     broker.start();
 
-    const first = broker.call("host.chat", "stream.subscribe", { thread_id: "t-1", after: 0 });
+    const first = broker.call("host.conversation", "stream.subscribe", { thread_id: "t-1", after: 0 });
     const hello = transport.sent.at(-1) as { request_id: string };
     transport.deliver({
       channel: BROKER_CHANNEL,
       view: VIEW,
       control: HELLO_CONTROL,
       protocol: 1,
-      doors: ["host.chat.stream.subscribe"],
+      doors: ["host.conversation.stream.subscribe"],
     });
     transport.deliver({
       channel: BROKER_CHANNEL,
@@ -106,7 +106,7 @@ describe("a reconnect through the real broker loses nothing and repeats nothing"
     });
     expect(readSubscribeAnswer(await first)).toEqual({ cursor: 3, subscription_id: "s-1" });
 
-    const second = broker.call("host.chat", "stream.subscribe", { thread_id: "t-1", after: 41 });
+    const second = broker.call("host.conversation", "stream.subscribe", { thread_id: "t-1", after: 41 });
     const retry = transport.sent.at(-1) as { request_id: string };
     transport.deliver({
       channel: BROKER_CHANNEL,

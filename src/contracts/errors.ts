@@ -4,7 +4,6 @@ export const ERROR_CODES = [
   "protocol_mismatch",
   "unregistered_frame",
   "stale_view",
-  "not_official_install",
   "forbidden_scope",
   "not_found",
   "invalid_input",
@@ -21,7 +20,6 @@ const MESSAGES: Record<ErrorCode, string> = {
   protocol_mismatch: "this Chat and the running Ponpoko speak different protocols",
   unregistered_frame: "the host does not know which surface sent this",
   stale_view: "this Chat tab was replaced by a newer one",
-  not_official_install: "the privileged Chat API belongs to the official install",
   forbidden_scope: "the request reached outside what this Chat may touch",
   not_found: "the thing the request names is not here",
   invalid_input: "the request carried an argument the host refuses",
@@ -48,9 +46,6 @@ export class HostError extends Error {
   get recovery(): string {
     if (this.code === "protocol_mismatch") {
       return "Update the Chat surface, or restart Ponpoko so both sides run the same protocol.";
-    }
-    if (this.code === "not_official_install") {
-      return "Install Chat from Ponpoko itself; a bundle that names itself chat has no privileged API.";
     }
     if (this.code === "stale_view") {
       return "Reload this tab — a newer Chat took over the conversation.";

@@ -10,7 +10,7 @@ export const DROP_CONTROL = "ponpoko.host.drop";
 
 export const PROTOCOL_VERSION = 1;
 
-export const HOST_CHAT = "host.chat";
+export const HOST_CONVERSATION = "host.conversation";
 
 export const HOST_WORK = "host.work";
 
@@ -18,7 +18,7 @@ export const HOST_SURFACE = "host.surface";
 
 export const SURFACE_OPERATIONS = ["tool.file", "tool.paste", "backend.call"] as const;
 
-export const NAMESPACES = [HOST_CHAT, HOST_WORK, HOST_SURFACE] as const;
+export const NAMESPACES = [HOST_CONVERSATION, HOST_WORK, HOST_SURFACE] as const;
 
 export type Namespace = (typeof NAMESPACES)[number];
 
@@ -65,7 +65,7 @@ export const WORK_OPERATIONS = [
 export type WorkOperation = (typeof WORK_OPERATIONS)[number];
 
 export const OPERATIONS: Record<Namespace, readonly string[]> = {
-  [HOST_CHAT]: CHAT_OPERATIONS,
+  [HOST_CONVERSATION]: CHAT_OPERATIONS,
   [HOST_WORK]: WORK_OPERATIONS,
   [HOST_SURFACE]: SURFACE_OPERATIONS,
 };

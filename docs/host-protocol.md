@@ -14,7 +14,7 @@ no key material and no system prompt it composes itself.
 | --- | --- | --- |
 | ready | surface → host | `{ channel: "ponpoko.surface.v1", view, control: "ponpoko.surface.ready" }` |
 | hello | host → surface | `{ channel, view, control: "ponpoko.host.hello", protocol: 1, doors: [...] }` |
-| info | surface → host | `host.chat.protocol.info` → `{ protocol, host_version, official, identity, install_id }` |
+| info | surface → host | `host.conversation.protocol.info` → `{ protocol, host_version, identity }` |
 
 The view token comes from `?view=` on the frame URL. A message for another view is dropped
 unread, so a stale frame can never answer for a live one. If the host's `protocol` and this
@@ -29,7 +29,7 @@ There is no alternate protocol or legacy envelope.
 `src/contracts/protocol.ts` is the single source of truth. A request names a namespace and an
 operation from a closed list; there is no free-form verb, no `invoke`, and no shell escape.
 
-`host.chat`: `protocol.info`, `threads.list|create|update|rename|pin|delete|search|export`,
+`host.conversation`: `protocol.info`, `threads.list|create|update|rename|pin|delete|search|export`,
 `messages.list|append|truncate`, `message.send`, `stream.subscribe|unsubscribe`, `turn.cancel`,
 `providers.list`, `attachments.pick|read|paste-image`, `preferences.list|set`,
 `settings.open`, `link.open`.
@@ -42,7 +42,7 @@ surface it produced; it never runs the loop itself.
 
 ```json
 { "channel": "ponpoko.surface.v1", "view": "<token>", "request_id": "<id>",
-  "namespace": "host.chat", "operation": "threads.list", "payload": { "…": "…" } }
+  "namespace": "host.conversation", "operation": "threads.list", "payload": { "…": "…" } }
 ```
 
 ```json
@@ -77,6 +77,8 @@ the page must reload the transcript through `messages.list` instead of trusting 
 
 ## Identity
 
-`protocol.info.identity` names the host-managed official install. Chat does not decide it is
-privileged because `surface.json` says `"id": "chat"`: the host derives the identity from its own
-install metadata, and a bundle that merely renames itself receives `not_official_install`.
+`protocol.info.identity` names the installed surface registered for this live frame. It is
+not an authorization tier. Chat, Editor and custom bundles receive the same host service APIs;
+no name, repository or installer provenance grants privileged access. The host still checks
+view ownership, request scope, protocol, operation and subscription on every call. Credentials
+and trusted prompt composition remain in the host.

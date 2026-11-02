@@ -14,7 +14,7 @@ function hello(protocol: number, view = VIEW) {
     view,
     control: HELLO_CONTROL,
     protocol,
-    doors: ["host.chat"],
+    doors: ["host.conversation"],
   };
 }
 
@@ -65,7 +65,7 @@ describe("broker handshake", () => {
     expect(instance.helloView()).toBeNull();
     const pending = instance.awaitHello();
     transport.deliver(hello(1));
-    expect(await pending).toEqual({ protocol: 1, doors: ["host.chat"] });
+    expect(await pending).toEqual({ protocol: 1, doors: ["host.conversation"] });
     instance.stop();
   });
 
@@ -80,10 +80,10 @@ describe("broker handshake", () => {
   test("answers are attributed by request id, and a foreign view is never read", async () => {
     const { transport, instance } = broker();
     instance.start();
-    const first = instance.call("host.chat", "threads.list");
-    const second = instance.call("host.chat", "threads.list");
+    const first = instance.call("host.conversation", "threads.list");
+    const second = instance.call("host.conversation", "threads.list");
     expect(transport.sent[1]).toMatchObject({
-      namespace: "host.chat",
+      namespace: "host.conversation",
       operation: "threads.list",
       request_id: "r1",
     });
@@ -98,7 +98,7 @@ describe("broker handshake", () => {
   test("an unrecognized channel is never mistaken for the broker", async () => {
     const { transport, instance } = broker();
     instance.start();
-    const pending = instance.call("host.chat", "protocol.info");
+    const pending = instance.call("host.conversation", "protocol.info");
     transport.deliver({
       channel: "unrecognized.surface",
       view: VIEW,
@@ -115,7 +115,7 @@ describe("broker failures", () => {
   test("a typed error keeps its code, message and retryability", async () => {
     const { transport, instance } = broker();
     instance.start();
-    const pending = instance.call("host.chat", "messages.list");
+    const pending = instance.call("host.conversation", "messages.list");
     transport.deliver(refusal("r1", "cursor_expired", true));
     const error = await pending.catch((e) => e);
     expect(error).toBeInstanceOf(HostError);
@@ -128,7 +128,7 @@ describe("broker failures", () => {
   test("an unknown error code is reported as a transport failure, never invented", async () => {
     const { transport, instance } = broker();
     instance.start();
-    const pending = instance.call("host.chat", "messages.list");
+    const pending = instance.call("host.conversation", "messages.list");
     transport.deliver(refusal("r1", "who_knows"));
     const error = await pending.catch((e) => e);
     expect(error.code).toBe("transport");
@@ -139,7 +139,7 @@ describe("broker failures", () => {
     const { instance } = broker();
     instance.start();
     const started = Date.now();
-    const error = await instance.call("host.chat", "threads.list").catch((e) => e);
+    const error = await instance.call("host.conversation", "threads.list").catch((e) => e);
     expect(error).toBeInstanceOf(HostError);
     expect(error.code).toBe("transport");
     expect(Date.now() - started).toBeLessThan(REQUEST_TIMEOUT_MS);
@@ -149,7 +149,7 @@ describe("broker failures", () => {
   test("stopping rejects every pending call and drops the subscription", async () => {
     const { transport, instance } = broker();
     instance.start();
-    const pending = instance.call("host.chat", "threads.list");
+    const pending = instance.call("host.conversation", "threads.list");
     instance.stop();
     await expect(pending).rejects.toBeInstanceOf(HostError);
     const seen: unknown[] = [];

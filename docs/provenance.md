@@ -27,13 +27,13 @@ laws are proven on this side of the move.
 
 | Here | Host origin | Why it is not a copy |
 | --- | --- | --- |
-| `src/app/host.ts` | `app/src/lib/shellCore/chat_api.ts`, `stream_api.ts`, `llm_api.ts` | every `invoke()` became a `host.chat` operation; there is no Tauri IPC in a surface |
+| `src/app/host.ts` | `app/src/lib/shellCore/chat_api.ts`, `stream_api.ts`, `llm_api.ts` | every `invoke()` became a `host.conversation` operation; there is no Tauri IPC in a surface |
 | `src/bridge/**` | `app/src/lib/surfaceBridge.ts` (host side of the old door) | the door verbs are replaced by the two namespaces of `docs/host-protocol.md` |
 | `src/chat/useChatThreads.ts` | same name | `listen("chat://…")` became `broker.onEvent`; storage preferences moved to `src/lib/prefs.ts` |
 | `src/chat/useChatStream.ts` | same name | the stream now arrives as broker events; the system prompt is composed by the host, not here |
 | `src/chat/useChatContext.ts` | same name | file dialogs, drag-and-drop and image paste became `attachments.*` operations and the host's drop control |
 | `src/chat/{Welcome,PokoSetup}.tsx` | same names | provider/key setup stays in the host: these only open the host settings window |
-| `src/chat/usePonpokoActions.ts` | same name | `open_external_url` became `host.chat.link.open` |
+| `src/chat/usePonpokoActions.ts` | same name | `open_external_url` became `host.conversation.link.open` |
 | `src/lib/chatStyles.ts` | `app/src/lib/prompts/styles.ts` | the style list and preambles the UI shows; the host composes the actual system prompt |
 | `src/lib/modelLabel.ts` | `app/src/lib/modelSetup.ts` | provider display metadata only — never a credential |
 | `src/lib/{poko,time,theme,mediaQuery,clipboard,prefs}.ts` | same names under `app/src/lib/` | unchanged or trimmed to what a surface needs |

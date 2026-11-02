@@ -1,5 +1,5 @@
 import type { Broker, HelloView } from "../bridge/broker";
-import { HOST_CHAT, PROTOCOL_VERSION, type BrokerEvent } from "../contracts/protocol";
+import { HOST_CONVERSATION, PROTOCOL_VERSION, type BrokerEvent } from "../contracts/protocol";
 import {
   readContextFile,
   readMessages,
@@ -27,7 +27,7 @@ export interface Host {
 }
 
 export function hostChat<T>(host: Host, operation: string, payload?: unknown): Promise<T> {
-  return host.broker.call<T>(HOST_CHAT, operation, payload);
+  return host.broker.call<T>(HOST_CONVERSATION, operation, payload);
 }
 
 export async function readProtocol(host: Host): Promise<ProtocolInfoView> {

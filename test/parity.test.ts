@@ -72,7 +72,7 @@ describe("harness parity inventory", () => {
   test("every host-backed capability names a real operation of the closed union", () => {
     for (const row of ROWS) {
       if (row.hostCall === null) continue;
-      expect(protocol.isOperation("host.chat", row.hostCall)).toBe(true);
+      expect(protocol.isOperation("host.conversation", row.hostCall)).toBe(true);
     }
   });
 

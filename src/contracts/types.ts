@@ -107,9 +107,7 @@ export const PROTOCOL_INFO = "protocol.info";
 export interface ProtocolInfoView {
   protocol: number;
   host_version: string;
-  official: boolean;
   identity: string;
-  install_id: string | null;
 }
 
 export interface StreamSubscriptionView {
@@ -213,9 +211,7 @@ export function readProtocolInfo(value: unknown): ProtocolInfoView {
   return {
     protocol: num(row.protocol),
     host_version: str(row.host_version),
-    official: row.official === true,
     identity: str(row.identity),
-    install_id: nullableStr(row.install_id),
   };
 }
 

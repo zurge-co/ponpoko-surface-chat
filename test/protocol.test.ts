@@ -18,7 +18,7 @@ describe("closed operation unions", () => {
     );
     expect(chatOnly.length).toBe(protocol.CHAT_OPERATIONS.length);
     for (const operation of protocol.WORK_OPERATIONS) {
-      expect(protocol.isOperation("host.chat", operation)).toBe(false);
+      expect(protocol.isOperation("host.conversation", operation)).toBe(false);
     }
   });
 
@@ -32,10 +32,10 @@ describe("closed operation unions", () => {
   });
 
   test("a namespace and its operation are both required to name a call", () => {
-    expect(protocol.isNamespace("host.chat")).toBe(true);
+    expect(protocol.isNamespace("host.conversation")).toBe(true);
     expect(protocol.isNamespace("host.everything")).toBe(false);
-    expect(protocol.isOperation("host.chat", "threads.list")).toBe(true);
-    expect(protocol.isOperation("host.chat", "threads.nuke")).toBe(false);
+    expect(protocol.isOperation("host.conversation", "threads.list")).toBe(true);
+    expect(protocol.isOperation("host.conversation", "threads.nuke")).toBe(false);
   });
 
   test("one channel and protocol serve every surface", () => {
@@ -46,12 +46,12 @@ describe("closed operation unions", () => {
   });
 
   test("a request carries the view, a request id and no free-form verb", () => {
-    const request = protocol.requestFor("view-a", "r1", "host.chat", "threads.list", { a: 1 });
+    const request = protocol.requestFor("view-a", "r1", "host.conversation", "threads.list", { a: 1 });
     expect(request).toEqual({
       channel: protocol.BROKER_CHANNEL,
       view: "view-a",
       request_id: "r1",
-      namespace: "host.chat",
+      namespace: "host.conversation",
       operation: "threads.list",
       payload: { a: 1 },
     });
@@ -80,11 +80,7 @@ describe("typed errors", () => {
     expect(ERROR_CODES).not.toContain(error.code);
   });
 
-  test("a spoofed manifest id has its own recovery, not a generic retry", () => {
-    const error = hostErrorFrom({ code: "not_official_install", message: "no", retryable: false });
-    expect(error.recovery).toContain("Install Chat from Ponpoko itself");
-    expect(error.retryable).toBe(false);
-  });
+
 });
 
 describe("reading host rows", () => {
@@ -116,9 +112,10 @@ describe("reading host rows", () => {
   });
 
   test("a protocol answer keeps the host's own numbers untouched", () => {
-    const info = types.readProtocolInfo({ protocol: 1, host_version: "0.19.4", official: true });
+    const info = types.readProtocolInfo({ protocol: 1, host_version: "0.19.4" });
     expect(info.protocol).toBe(1);
-    expect(info.official).toBe(true);
-    expect(info.install_id).toBeNull();
+    expect(info.identity).toBe("");
+    expect("official" in info).toBe(false);
+    expect("install_id" in info).toBe(false);
   });
 });
