@@ -1,0 +1,82 @@
+# The host protocol this Chat speaks
+
+Chat is an installed surface. It owns its UI, its Markdown and PonpokoUI renderers, and its
+presentation preferences. Everything durable — threads, messages, providers, keys, the model
+and tool loop, the composed system prompt — belongs to Ponpoko's host. The page therefore talks
+to exactly one thing: the versioned broker in `src/bridge/`, over `postMessage` inside its frame.
+
+Nothing here is Tauri: the bundle contains no `@tauri-apps` import, no `__TAURI_INTERNALS__`,
+no key material and no system prompt it composes itself.
+
+## Channel and handshake
+
+| Step | Direction | Message |
+| --- | --- | --- |
+| ready | surface → host | `{ channel: "ponpoko.surface.v2", view, control: "ponpoko.surface.ready" }` |
+| hello | host → surface | `{ channel, view, control: "ponpoko.host.hello", protocol: 2, doors: [...] }` |
+| info | surface → host | `host.chat.protocol.info` → `{ protocol, host_version, official, identity, install_id }` |
+
+The view token comes from `?view=` on the frame URL. A message for another view is dropped
+unread, so a stale frame can never answer for a live one. If the host's `protocol` and this
+bundle's `PROTOCOL_VERSION` differ, Chat renders the mismatch screen and reads nothing else.
+
+The older `ponpoko.surface.v1` channel — `tool.file`, `tool.paste`, `backend.call` — is never
+mistaken for a broker answer: `isBrokerChannel` accepts both, but a response is only read when
+its `channel` is `ponpoko.surface.v2`.
+
+## Two namespaces, closed unions
+
+`src/contracts/protocol.ts` is the single source of truth. A request names a namespace and an
+operation from a closed list; there is no free-form verb, no `invoke`, and no shell escape.
+
+`host.chat`: `protocol.info`, `threads.list|create|update|rename|pin|delete|search|export`,
+`messages.list|append|truncate`, `message.send`, `stream.subscribe|unsubscribe`, `turn.cancel`,
+`providers.list`, `attachments.pick|read|paste-image`, `preferences.list|set`,
+`settings.open`, `link.open`.
+
+`host.work`: `list`, `get`, `events.subscribe|unsubscribe`, `instruction.append`,
+`pause|resume|stop`. Chat reads the work a workspace is doing so a conversation can point at the
+surface it produced; it never runs the loop itself.
+
+## Request and answer
+
+```json
+{ "channel": "ponpoko.surface.v2", "view": "<token>", "request_id": "<id>",
+  "namespace": "host.chat", "operation": "threads.list", "payload": { "…": "…" } }
+```
+
+```json
+{ "channel": "ponpoko.surface.v2", "view": "<token>", "request_id": "<id>",
+  "ok": true, "result": [] }
+```
+
+A refusal carries a typed body, never a bare string:
+
+```json
+{ "ok": false, "error": { "code": "cursor_expired", "message": "…", "retryable": true } }
+```
+
+`src/contracts/errors.ts` lists every code and gives each one a recovery sentence the human can
+act on. A code the host does not declare degrades to a `transport` failure rather than being
+echoed as if the host had said it.
+
+## Events
+
+```json
+{ "channel": "ponpoko.surface.v2", "view": "<token>", "event_id": "<id>", "seq": 12,
+  "type": "delta", "timestamp": 1730000000, "thread_id": "…", "payload": { "request_id": "…", "text": "…" } }
+```
+
+Chat reads `delta`, `tool`, `done`, `failed`, `cancelled`, `providers-changed` and
+`threads-changed`. Events are deduplicated on `(scope, event_id, seq)` where the scope is the
+work or the thread, so replaying a cursor after a reload never doubles a token and two threads
+carrying the same event id never hide each other.
+
+`stream.subscribe` answers with the cursor the host is at, and a `cursor_expired` refusal means
+the page must reload the transcript through `messages.list` instead of trusting a stale cursor.
+
+## Identity
+
+`protocol.info.identity` names the host-managed official install. Chat does not decide it is
+privileged because `surface.json` says `"id": "chat"`: the host derives the identity from its own
+install metadata, and a bundle that merely renames itself receives `not_official_install`.

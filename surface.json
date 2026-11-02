@@ -1,0 +1,14 @@
+{
+  "id": "chat",
+  "name": "Chat",
+  "version": "0.1.0",
+  "entry": "index.html",
+  "description": "Chat with Poko using the Ponpoko host runtime.",
+  "contributes": [
+    {
+      "slot": "nav",
+      "title": "Chat",
+      "icon": "generic"
+    }
+  ]
+}

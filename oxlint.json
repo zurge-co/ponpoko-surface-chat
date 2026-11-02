@@ -1,0 +1,3 @@
+{
+  "ignorePatterns": ["dist", "node_modules", "src/ponpoko-ui/**", "src/chat/markdown/**", "src/chat/highlight/**", "src/chat/ponpoko-ui/**"]
+}

@@ -1,0 +1,8 @@
+No licence is declared for this source.
+
+The Chat surface was moved out of the Ponpoko host repository, which declares no licence file at
+the commit the move was made from. Until that repository's licence is decided, this bundle
+asserts no licence of its own and grants no rights beyond what the host's terms already give.
+
+Do not replace this file with an invented licence. Replace it only with the licence the source
+actually carries, and record that decision in docs/provenance.md.
