@@ -1,7 +1,7 @@
 const { describe, test, expect } = await import("bun:test");
 const { Broker, readTokens, REQUEST_TIMEOUT_MS } = await import("../src/bridge/broker");
 const { memoryTransport } = await import("../src/bridge/transport");
-const { BROKER_CHANNEL, LEGACY_CHANNEL, HELLO_CONTROL, READY_CONTROL } = await import(
+const { BROKER_CHANNEL, HELLO_CONTROL, READY_CONTROL } = await import(
   "../src/contracts/protocol"
 );
 const { HostError } = await import("../src/contracts/errors");
@@ -64,8 +64,8 @@ describe("broker handshake", () => {
     transport.deliver(hello(2, "b".repeat(32)));
     expect(instance.helloView()).toBeNull();
     const pending = instance.awaitHello();
-    transport.deliver(hello(2));
-    expect(await pending).toEqual({ protocol: 2, doors: ["host.chat"] });
+    transport.deliver(hello(1));
+    expect(await pending).toEqual({ protocol: 1, doors: ["host.chat"] });
     instance.stop();
   });
 
@@ -95,12 +95,12 @@ describe("broker handshake", () => {
     instance.stop();
   });
 
-  test("the legacy channel is never mistaken for the broker", async () => {
+  test("an unrecognized channel is never mistaken for the broker", async () => {
     const { transport, instance } = broker();
     instance.start();
     const pending = instance.call("host.chat", "protocol.info");
     transport.deliver({
-      channel: LEGACY_CHANNEL,
+      channel: "unrecognized.surface",
       view: VIEW,
       request_id: "r1",
       ok: true,
@@ -223,6 +223,24 @@ describe("broker doors", () => {
       paths: ["/tmp/a.png", ""],
     });
     expect(seen).toEqual([["/tmp/a.png"]]);
+    instance.stop();
+  });
+});
+
+describe("palette delivery", () => {
+  test("late subscribers receive the current palette and stale frames cannot replace it", () => {
+    const { transport, instance } = broker();
+    instance.start();
+    const palette = { channel: BROKER_CHANNEL, view: VIEW, control: "ponpoko.host.palette", tokens: { base: "#e6e9dc", accent: "#3c702f" } };
+    transport.deliver(palette);
+    const seen: Record<string, string>[] = [];
+    const off = instance.onPalette((tokens) => seen.push(tokens));
+    expect(seen).toEqual([palette.tokens]);
+    transport.deliver({ ...palette, view: "another", tokens: { base: "#ffffff" } });
+    expect(seen).toHaveLength(1);
+    transport.deliver({ ...palette, tokens: { base: "#241811" } });
+    expect(seen.at(-1)).toEqual({ base: "#241811" });
+    off();
     instance.stop();
   });
 });

@@ -60,6 +60,8 @@ export class Broker {
 
   private readonly eventHandlers = new Set<EventHandler>();
 
+  private palette: Record<string, string> | null = null;
+
   private readonly paletteHandlers = new Set<PaletteHandler>();
 
   private readonly dropHandlers = new Set<DropHandler>();
@@ -125,6 +127,7 @@ export class Broker {
 
   onPalette(handler: PaletteHandler): () => void {
     this.paletteHandlers.add(handler);
+    if (this.palette) handler(this.palette);
     return () => this.paletteHandlers.delete(handler);
   }
 
@@ -190,7 +193,10 @@ export class Broker {
     }
     if (message.control === PALETTE_CONTROL) {
       const tokens = readTokens(message.tokens);
-      if (tokens) for (const handler of this.paletteHandlers) handler(tokens);
+      if (tokens) {
+        this.palette = tokens;
+        for (const handler of this.paletteHandlers) handler(tokens);
+      }
       return;
     }
     if (typeof message.control === "string" && message.control.endsWith(".drop")) {

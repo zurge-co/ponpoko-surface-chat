@@ -1,6 +1,4 @@
-export const BROKER_CHANNEL = "ponpoko.surface.v2";
-
-export const LEGACY_CHANNEL = "ponpoko.surface.v1";
+export const BROKER_CHANNEL = "ponpoko.surface.v1";
 
 export const READY_CONTROL = "ponpoko.surface.ready";
 
@@ -10,13 +8,17 @@ export const PALETTE_CONTROL = "ponpoko.host.palette";
 
 export const DROP_CONTROL = "ponpoko.host.drop";
 
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 1;
 
 export const HOST_CHAT = "host.chat";
 
 export const HOST_WORK = "host.work";
 
-export const NAMESPACES = [HOST_CHAT, HOST_WORK] as const;
+export const HOST_SURFACE = "host.surface";
+
+export const SURFACE_OPERATIONS = ["tool.file", "tool.paste", "backend.call"] as const;
+
+export const NAMESPACES = [HOST_CHAT, HOST_WORK, HOST_SURFACE] as const;
 
 export type Namespace = (typeof NAMESPACES)[number];
 
@@ -65,6 +67,7 @@ export type WorkOperation = (typeof WORK_OPERATIONS)[number];
 export const OPERATIONS: Record<Namespace, readonly string[]> = {
   [HOST_CHAT]: CHAT_OPERATIONS,
   [HOST_WORK]: WORK_OPERATIONS,
+  [HOST_SURFACE]: SURFACE_OPERATIONS,
 };
 
 export function isNamespace(value: unknown): value is Namespace {
@@ -159,7 +162,7 @@ export interface BrokerControl {
 }
 
 export function isBrokerChannel(value: unknown): boolean {
-  return value === BROKER_CHANNEL || value === LEGACY_CHANNEL;
+  return value === BROKER_CHANNEL;
 }
 
 export function isBrokerResponse(value: unknown): value is BrokerResponse {

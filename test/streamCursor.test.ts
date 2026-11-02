@@ -94,7 +94,7 @@ describe("a reconnect through the real broker loses nothing and repeats nothing"
       channel: BROKER_CHANNEL,
       view: VIEW,
       control: HELLO_CONTROL,
-      protocol: 2,
+      protocol: 1,
       doors: ["host.chat.stream.subscribe"],
     });
     transport.deliver({

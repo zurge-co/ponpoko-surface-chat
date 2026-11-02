@@ -1,3 +1,4 @@
+import { applyPalette } from "../lib/palette";
 import { Broker } from "../bridge/broker";
 import { newRequestId, parentTransport, viewTokenFromLocation } from "../bridge/transport";
 import { PROTOCOL_VERSION } from "../contracts/protocol";
@@ -61,6 +62,7 @@ export async function bootChat(
     transport: options.transport ?? parentTransport(),
     newId: newRequestId,
   });
+  broker.onPalette((tokens) => applyPalette(tokens));
   broker.start();
 
   let hello;

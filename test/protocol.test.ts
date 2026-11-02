@@ -38,8 +38,9 @@ describe("closed operation unions", () => {
     expect(protocol.isOperation("host.chat", "threads.nuke")).toBe(false);
   });
 
-  test("the broker channel is not the legacy door channel", () => {
-    expect(protocol.BROKER_CHANNEL).not.toBe(protocol.LEGACY_CHANNEL);
+  test("one channel and protocol serve every surface", () => {
+    expect(protocol.BROKER_CHANNEL).toBe("ponpoko.surface.v1");
+    expect(protocol.PROTOCOL_VERSION).toBe(1);
     expect(protocol.isBrokerChannel(protocol.BROKER_CHANNEL)).toBe(true);
     expect(protocol.isBrokerChannel("ponpoko.surface.v0")).toBe(false);
   });
@@ -115,8 +116,8 @@ describe("reading host rows", () => {
   });
 
   test("a protocol answer keeps the host's own numbers untouched", () => {
-    const info = types.readProtocolInfo({ protocol: 2, host_version: "0.19.4", official: true });
-    expect(info.protocol).toBe(2);
+    const info = types.readProtocolInfo({ protocol: 1, host_version: "0.19.4", official: true });
+    expect(info.protocol).toBe(1);
     expect(info.official).toBe(true);
     expect(info.install_id).toBeNull();
   });

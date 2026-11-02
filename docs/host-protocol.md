@@ -12,19 +12,19 @@ no key material and no system prompt it composes itself.
 
 | Step | Direction | Message |
 | --- | --- | --- |
-| ready | surface → host | `{ channel: "ponpoko.surface.v2", view, control: "ponpoko.surface.ready" }` |
-| hello | host → surface | `{ channel, view, control: "ponpoko.host.hello", protocol: 2, doors: [...] }` |
+| ready | surface → host | `{ channel: "ponpoko.surface.v1", view, control: "ponpoko.surface.ready" }` |
+| hello | host → surface | `{ channel, view, control: "ponpoko.host.hello", protocol: 1, doors: [...] }` |
 | info | surface → host | `host.chat.protocol.info` → `{ protocol, host_version, official, identity, install_id }` |
 
 The view token comes from `?view=` on the frame URL. A message for another view is dropped
 unread, so a stale frame can never answer for a live one. If the host's `protocol` and this
 bundle's `PROTOCOL_VERSION` differ, Chat renders the mismatch screen and reads nothing else.
 
-The older `ponpoko.surface.v1` channel — `tool.file`, `tool.paste`, `backend.call` — is never
-mistaken for a broker answer: `isBrokerChannel` accepts both, but a response is only read when
-its `channel` is `ponpoko.surface.v2`.
+Every installed surface uses this same channel and request envelope. `host.surface` provides
+`tool.file`, `tool.paste` and `backend.call`; Chat and work add their scoped namespaces.
+There is no alternate protocol or legacy envelope.
 
-## Two namespaces, closed unions
+## Three namespaces, closed unions
 
 `src/contracts/protocol.ts` is the single source of truth. A request names a namespace and an
 operation from a closed list; there is no free-form verb, no `invoke`, and no shell escape.
@@ -41,12 +41,12 @@ surface it produced; it never runs the loop itself.
 ## Request and answer
 
 ```json
-{ "channel": "ponpoko.surface.v2", "view": "<token>", "request_id": "<id>",
+{ "channel": "ponpoko.surface.v1", "view": "<token>", "request_id": "<id>",
   "namespace": "host.chat", "operation": "threads.list", "payload": { "…": "…" } }
 ```
 
 ```json
-{ "channel": "ponpoko.surface.v2", "view": "<token>", "request_id": "<id>",
+{ "channel": "ponpoko.surface.v1", "view": "<token>", "request_id": "<id>",
   "ok": true, "result": [] }
 ```
 
@@ -63,7 +63,7 @@ echoed as if the host had said it.
 ## Events
 
 ```json
-{ "channel": "ponpoko.surface.v2", "view": "<token>", "event_id": "<id>", "seq": 12,
+{ "channel": "ponpoko.surface.v1", "view": "<token>", "event_id": "<id>", "seq": 12,
   "type": "delta", "timestamp": 1730000000, "thread_id": "…", "payload": { "request_id": "…", "text": "…" } }
 ```
 
