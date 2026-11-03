@@ -28,11 +28,9 @@ export class Turns {
     if (!messages.length || messages.at(-1)?.role !== "user") throw new Error("A turn needs a saved human message");
     const preferences = await this.runtime("preferences");
     const language = preferences.find((row: Row) => row.key === "chat_language")?.value ?? "auto";
-    const provider = thread.provider_id ?? payload.provider_id;
-    if (typeof provider !== "string" || !provider.trim()) throw new Error("Choose a model first");
     this.store.run("INSERT INTO turns(request_id,thread_id,status,input_count,created_at) VALUES(?,?,'starting',?,?)", requestId, id, messages.length, now());
     try {
-      const result = await this.runtime("start", { input: { request_id: requestId, provider_id: provider,
+      const result = await this.runtime("start", { input: { request_id: requestId, task_type: "text-generation",
         system: systemPrompt(thread, language, messages.at(-1)?.content), messages, rounds: 24, seconds: 300, output_bytes: 1_048_576, with_tools: true } });
       this.store.run("UPDATE turns SET work_id=?,status='running' WHERE request_id=?", result.work_id, requestId);
       this.observe(requestId);

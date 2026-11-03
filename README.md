@@ -75,3 +75,7 @@ docs/                 the host protocol and where every file came from
 `bun scripts/standalone.mjs` copies this checkout to a temp directory outside the host tree
 without `node_modules` or `dist`, then installs and runs all four there. That is the proof the
 bundle stands alone; run it before claiming the surface builds from its own checkout.
+
+AI calls select the Host `text-generation` task slot. The bundle owns context and turns,
+while the Host resolves the account or device connection, pins the invocation model, and
+records usage against this surface. No provider key or Cloud token reaches the bundle.

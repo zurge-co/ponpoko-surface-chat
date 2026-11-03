@@ -78,8 +78,11 @@ export class ChatBackend {
         return this.store.events(id, after);
       }
       case "providers.list": {
-        const providers = await this.runtime("providers");
-        return providers.map((provider: Row) => ({ ...provider, has_key: provider.has_credential || !provider.credential_required }));
+        const slots = await this.runtime("slots");
+        const local = slots.local.find((slot: Row) => slot.task_type === "text-generation");
+        const cloud = slots.cloud.find((slot: Row) => slot.task_type === "text-generation" && slot.enabled && slot.status === "active");
+        const model = local?.model ?? cloud?.alias_id;
+        return model ? [{provider_id:"default-slot",label:"Ponpoko AI",model,has_key:true}] : [];
       }
       case "preferences.list": return this.store.rows("SELECT key,value FROM settings ORDER BY key");
       case "preferences.set":
