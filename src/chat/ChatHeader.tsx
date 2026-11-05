@@ -126,7 +126,7 @@ export function ChatHeader(props: {
       )}
       <button
         type="button"
-        title="Search everything — conversations, prompts and actions (⌘K)"
+        title="Search everything — conversations, prompts and actions (⌘⇧P)"
         aria-label="Command palette"
         onClick={props.onOpenCommand}
         className="rounded-md p-1.5 text-fg-muted transition-colors hover:bg-active hover:text-fg"

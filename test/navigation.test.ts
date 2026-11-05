@@ -111,18 +111,18 @@ describe("rail grouping — date sections a human recognises", () => {
 describe("shortcuts — one muscle memory, no surprises", () => {
   const base = { metaKey: true, ctrlKey: false, altKey: false };
 
-  test("⌘N, ⌘K and ⌘B are the three navigation keys", () => {
+  test("⌘N, ⌘⇧P and ⌘B are the three navigation keys", () => {
     expect(shortcutFor({ ...base, key: "n" })).toBe("new-chat");
-    expect(shortcutFor({ ...base, key: "k" })).toBe("command-palette");
+    expect(shortcutFor({ ...base, key: "p", shiftKey: true })).toBe("command-palette");
     expect(shortcutFor({ ...base, key: "b" })).toBe("toggle-rail");
     expect(shortcutFor({ ...base, key: "/" })).toBeNull();
   });
 
   test("the same keys work with Ctrl", () => {
-    expect(shortcutFor({ key: "K", metaKey: false, ctrlKey: true, altKey: false })).toBe(
+    expect(shortcutFor({ key: "P", shiftKey: true, metaKey: false, ctrlKey: true, altKey: false })).toBe(
       "command-palette",
     );
-    expect(shortcutFor({ key: "K", metaKey: true, ctrlKey: false, altKey: false })).toBe(
+    expect(shortcutFor({ key: "P", shiftKey: true, metaKey: true, ctrlKey: false, altKey: false })).toBe(
       "command-palette",
     );
   });
@@ -137,6 +137,8 @@ describe("shortcuts — one muscle memory, no surprises", () => {
     expect(shortcutFor({ key: "k", metaKey: false, ctrlKey: false, altKey: false })).toBeNull();
     expect(shortcutFor({ key: "k", metaKey: true, ctrlKey: false, altKey: true })).toBeNull();
     expect(shortcutFor({ ...base, key: "p" })).toBeNull();
+    expect(shortcutFor({ ...base, key: "k" })).toBeNull();
+    for (const key of ["1", "2", "3", "4", "5", "6", "7", "8", "9"]) expect(shortcutFor({ ...base, key })).toBeNull();
     expect(shortcutFor({ ...base, key: "Escape" })).toBeNull();
   });
 });

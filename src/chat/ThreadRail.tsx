@@ -56,7 +56,7 @@ export function ThreadRail(props: {
           icon={<MessageSquarePlus size={15} />}
         />
         <IconButton
-          label="Search everything (⌘K)"
+          label="Search everything (⌘⇧P)"
           onClick={props.onOpenPalette}
           icon={<Command size={15} />}
         />
@@ -98,7 +98,7 @@ export function ThreadRail(props: {
         </h1>
         <div className="flex items-center gap-0.5">
           <IconButton
-            label="Search everything (⌘K)"
+            label="Search everything (⌘⇧P)"
             onClick={props.onOpenPalette}
             icon={<Command size={14} />}
           />

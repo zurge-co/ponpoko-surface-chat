@@ -62,7 +62,7 @@ export function Welcome(props: {
       )}
 
       <p className="mt-8 max-w-md text-xs leading-relaxed text-fg-muted/70">
-        ⌘K holds every action. Your conversations stay on this machine.
+        ⌘⇧P holds every action. Your conversations stay on this machine.
       </p>
     </div>
   );

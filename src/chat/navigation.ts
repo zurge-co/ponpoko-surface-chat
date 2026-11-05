@@ -93,12 +93,11 @@ export interface ShortcutEvent {
 export type ShortcutAction = "new-chat" | "command-palette" | "toggle-rail";
 
 export function shortcutFor(event: ShortcutEvent): ShortcutAction | null {
-  if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) return null;
+  if (!(event.metaKey || event.ctrlKey) || event.altKey) return null;
+  if (event.shiftKey) return event.key.toLowerCase() === "p" ? "command-palette" : null;
   switch (event.key.toLowerCase()) {
     case "n":
       return "new-chat";
-    case "k":
-      return "command-palette";
     case "b":
       return "toggle-rail";
     default:
