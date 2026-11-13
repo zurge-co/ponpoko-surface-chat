@@ -37,7 +37,8 @@ and the transitional `PONPOKO_HOST_DATABASE` import source. The control file nam
 authenticated loopback endpoint using protocol 1 and Bearer authorization. Runtime requests
 use verb `runtime`, the installed surface ID, and `extra.operation`:
 `providers`, `preferences`, `start`, `lookup`, `status`, `events`, `stop`.
-`start` takes an `input` with request/provider IDs, system prompt, messages, explicit
+Requests declare `contract_version: 1`. `start` takes an `input` with a request ID,
+provider-neutral input/output modalities, system prompt, messages, explicit
 rounds/seconds/output_bytes allowances and with_tools. Other work operations use work_id;
 lookup uses request_id; events also uses after. These are generic services available equally
 to every installed backend. Credentials remain in Host.

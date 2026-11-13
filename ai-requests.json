@@ -1,0 +1,23 @@
+[
+  {
+    "request_id": "chat-context-example",
+    "io": {
+      "inputs": [
+        "text"
+      ],
+      "outputs": [
+        "text"
+      ]
+    },
+    "input": [
+      {
+        "type": "text",
+        "text": "A safe example conversation"
+      }
+    ],
+    "budget": {
+      "seconds": 120,
+      "output_bytes": 1048576
+    }
+  }
+]

@@ -34,5 +34,8 @@
     "preferences.list",
     "preferences.set",
     "stream.snapshot"
-  ]
+  ],
+  "requires": {
+    "ai": 1
+  }
 }

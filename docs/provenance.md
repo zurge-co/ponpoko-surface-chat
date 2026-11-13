@@ -1,7 +1,7 @@
 # Provenance of what was moved here
 
 This bundle is a repository of its own. Everything below was copied out of the Ponpoko host
-checkout (`/Users/saint/zurge/ponpoko`, commit `86e85c6` plus the surface-workspace work that
+checkout (`zurge-co/ponpoko`, commit `86e85c6` plus the surface-workspace work that
 followed it) and is maintained here from now on. The host no longer owns these files.
 
 ## Copied, then adapted to the broker

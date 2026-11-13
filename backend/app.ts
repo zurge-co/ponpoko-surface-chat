@@ -79,8 +79,8 @@ export class ChatBackend {
       }
       case "providers.list": {
         const slots = await this.runtime("slots");
-        const local = slots.local.find((slot: Row) => slot.task_type === "text-generation");
-        const cloud = slots.cloud.find((slot: Row) => slot.task_type === "text-generation" && slot.enabled && slot.status === "active");
+        const local = slots.local.find((slot: Row) => slot.io?.inputs?.includes("text") && slot.io?.outputs?.includes("text"));
+        const cloud = slots.cloud.find((slot: Row) => slot.io?.inputs?.includes("text") && slot.io?.outputs?.includes("text") && slot.enabled && slot.status === "active");
         const model = local?.model ?? cloud?.alias_id;
         return model ? [{provider_id:"default-slot",label:"Ponpoko AI",model,has_key:true}] : [];
       }

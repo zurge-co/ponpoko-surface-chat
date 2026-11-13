@@ -42,6 +42,8 @@ async function main() {
   await mkdir(join(DIST, "bin"), { recursive: true });
   const compiled = Bun.spawnSync(["bun", "build", "backend/main.ts", "--compile", "--minify", "--outfile", "dist/bin/chat-backend"], { cwd: PROJECT, stdout: "inherit", stderr: "inherit" });
   if (compiled.exitCode !== 0) fail("Chat backend did not compile");
+  await copyFile(MANIFEST, join(DIST, "surface.json"));
+  for (const file of ["ai-contract.json","ai-requests.json"]) await copyFile(join(PROJECT,file),join(DIST,file));
   const files = await walk(DIST);
   const total = files.reduce((sum, file) => sum + file.bytes, 0);
   if (files.length > MAX_FILES) fail(`${files.length} files is more than the host's ${MAX_FILES}`);
@@ -67,7 +69,6 @@ async function main() {
   }
 
   await mkdir(DIST, { recursive: true });
-  await copyFile(MANIFEST, join(DIST, "surface.json"));
 
   const summary = {
     id: manifest.id,

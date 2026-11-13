@@ -30,7 +30,7 @@ export class Turns {
     const language = preferences.find((row: Row) => row.key === "chat_language")?.value ?? "auto";
     this.store.run("INSERT INTO turns(request_id,thread_id,status,input_count,created_at) VALUES(?,?,'starting',?,?)", requestId, id, messages.length, now());
     try {
-      const result = await this.runtime("start", { input: { request_id: requestId, task_type: "text-generation",
+      const result = await this.runtime("start", { input: { request_id: requestId, io: { inputs: messages.some(message => message.images?.length) ? ["text", "image"] : ["text"], outputs: ["text"] },
         system: systemPrompt(thread, language, messages.at(-1)?.content), messages, rounds: 24, seconds: 300, output_bytes: 1_048_576, with_tools: true } });
       this.store.run("UPDATE turns SET work_id=?,status='running' WHERE request_id=?", result.work_id, requestId);
       this.observe(requestId);

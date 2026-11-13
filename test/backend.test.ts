@@ -98,7 +98,7 @@ describe("Chat orchestrates turns through one shared runtime", () => {
     expect(f.input[0]?.system).toContain("senior engineer");
     expect(f.input[0]?.system).toContain("ponpoko-ui");
     expect(f.input[0]?.rounds).toBeGreaterThan(0);
-    expect(f.input[0]?.task_type).toBe("text-generation");
+    expect(f.input[0]?.io).toEqual({ inputs: ["text"], outputs: ["text"] });
     expect(f.input[0]?.provider_id).toBeUndefined();
     await expect(f.app.call("threads.delete", { thread_id: thread.thread_id })).rejects.toThrow("Stop");
     await expect(f.app.call("message.send", { ...payload, request_id: "other" })).rejects.toThrow("Stop");

@@ -76,7 +76,7 @@ docs/                 the host protocol and where every file came from
 without `node_modules` or `dist`, then installs and runs all four there. That is the proof the
 bundle stands alone; run it before claiming the surface builds from its own checkout.
 
-AI calls select the Host `text-generation` task slot. The bundle owns context and turns,
+AI calls declare text input/output modalities; Host selects a compatible slot. The bundle owns context and turns,
 while the Host resolves the account or device connection, pins the invocation model, and
 records usage against this surface. No provider key or Cloud token reaches the bundle.
 
@@ -84,3 +84,5 @@ records usage against this surface. No provider key or Cloud token reaches the b
 
 Cmd/Ctrl+1–9 switches Favorite surfaces and Cmd/Ctrl+K opens Ponpoko's surface picker.
 Chat leaves these chords to the Host. Cmd/Ctrl+Shift+P opens Chat's own command palette.
+
+See [the public SDK contract and compatibility checks](docs/sdk.md).
